@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Bar</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>FOOD BAR</h1>
+    </header>
+    <main>
+        <div id="product-list" class="product-grid">
+            </div>
+    </main>
+    <aside id="cart-section">
+        <h2>Carrinho</h2>
+        <div id="cart-items">
+            <p>Seu carrinho está vazio.</p>
+        </div>
+        <div id="cart-total">
+            <strong>Total: R$ 0,00</strong>
+        </div>
+        <div id="checkout-area" style="display: none;">
+            <hr>
+            <button id="finalize-purchase">Finalizar Compra</button>
+        </div>
+    </aside>
+
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <template id="product-card-template">
+        <div class="product-card">
+            <img src="" alt="Imagem do Produto">
+            <h3 class="product-name"></h3>
+            <p class="product-price"></p>
+            <p class="product-stock"></p>
+            <div class="quantity-selector">
+                <button class="quantity-btn minus">-</button>
+                <input type="number" class="quantity-input" value="1" min="1">
+                <button class="quantity-btn plus">+</button>
+            </div>
+            <button class="add-to-cart-btn">Adicionar ao Carrinho</button>
+        </div>
+    </template>
+
+    <script src="script.js"></script>
+</body>
+</html>
