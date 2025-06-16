@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // !!! IMPORTANTE: Cole aqui a URL do seu App da Web !!!
-    const API_URL = 'https://script.google.com/macros/s/AKfycbykLC7CZyju8sAbRAxAFPrASV1ois0aSYkMOs6G0KSXtsYWoyPi_jhcC0yU-SrTyXi_BQ/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxnnD7eugZ4LcxcEtUa1ia9wcI1cDOlctXpUNUMEMyKQXFZwVGk_tRwKTnjevj7tg29mQ/exec';
 
     const productList = document.getElementById('product-list');
     const productCardTemplate = document.getElementById('product-card-template');
