@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // !!! IMPORTANTE: Cole aqui a URL do seu App da Web !!!
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxnnD7eugZ4LcxcEtUa1ia9wcI1cDOlctXpUNUMEMyKQXFZwVGk_tRwKTnjevj7tg29mQ/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbwzdWPIMjXywQTGud3Mb8rJh3fA2BA8B08mzpiqaFrMyYIrv1MU3L2J2ALGrLloQQ46UQ/exec';
 
     const productList = document.getElementById('product-list');
     const productCardTemplate = document.getElementById('product-card-template');
@@ -47,7 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
             card.querySelector('.product-name').textContent = product.nome;
             card.querySelector('.product-price').textContent = `R$ ${product.preco.toFixed(2).replace('.', ',')}`;
             card.querySelector('.product-stock').textContent = `Estoque: ${product.estoque}`;
-            card.querySelector('img').src = product.imagem;
             
             const quantityInput = card.querySelector('.quantity-input');
             quantityInput.max = product.estoque;
