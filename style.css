@@ -1,0 +1,386 @@
+:root {
+    --fundo: #0B1614;
+    --detalhe: #EEFF00;
+    --texto-principal: #EAEAEA;
+    --texto-secundario: #A0A0A0;
+    --card-fundo: #1A2926;
+    --fonte-principal: 'Big Shoulders Display', sans-serif;
+}
+
+/* --- ESTILOS GERAIS --- */
+body {
+    font-family: var(--fonte-principal);
+    background-color: var(--fundo);
+    color: var(--texto-principal);
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+        "header header"
+        "main aside";
+    gap: 20px;
+    margin: 0;
+    padding: 20px;
+    height: 100vh;
+    box-sizing: border-box;
+}
+
+/* --- CABEÇALHO --- */
+header h1 {
+    grid-area: header;
+    text-align: center;
+    color: var(--detalhe);
+    font-size: 4rem;
+    letter-spacing: 0.2rem;
+    text-transform: uppercase;
+    margin: 0 0 20px 0;
+}
+
+main { grid-area: main; overflow-y: auto; }
+
+/* --- GRID DE PRODUTOS --- */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+/* --- CARD DE PRODUTO --- */
+.product-card {
+    background: var(--card-fundo);
+    border: 2px solid var(--detalhe);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.product-card:hover {
+    transform: translateY(-0.8px);
+    box-shadow: 0 10px 20px rgba(238, 255, 0, 0.1);
+}
+
+.product-card .product-name {
+    font-size: 1.8rem;
+    text-transform: uppercase;
+    margin: 10px 0;
+    flex-grow: 1; /* Faz o nome empurrar o resto para baixo */
+}
+
+.product-card .product-price {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--detalhe);
+    margin: 10px 0;
+}
+
+.product-card .product-stock {
+    font-size: 1rem;
+    color: var(--texto-secundario);
+    text-transform: uppercase;
+}
+
+/* --- BOTÕES E INPUTS --- */
+.quantity-selector {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 15px 0;
+}
+
+.quantity-input {
+    width: 60px;
+    text-align: center;
+    border: 2px solid var(--detalhe);
+    background-color: var(--fundo);
+    color: var(--texto-principal);
+    font-family: var(--fonte-principal);
+    font-size: 1.5rem;
+    padding: 5px;
+    margin: 0 5px;
+    border-radius: 4px;
+}
+
+.quantity-btn, .add-to-cart-btn, #finalize-purchase {
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-family: var(--fonte-principal);
+    font-size: 1.2rem;
+    font-weight: 700;
+    transition: background-color 0.2s, color 0.2s;
+    background-color: var(--detalhe);
+    color: var(--fundo);
+    border: none;
+}
+
+.add-to-cart-btn {
+    width: 100%;
+}
+
+.quantity-btn:hover, .add-to-cart-btn:hover, #finalize-purchase:hover {
+    background-color: var(--fundo);
+    color: var(--detalhe);
+    outline: 2px solid var(--detalhe);
+}
+
+/* --- CARRINHO --- */
+aside#cart-section {
+    grid-area: aside;
+    background: var(--card-fundo);
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid var(--detalhe);
+    display: flex;
+    flex-direction: column;
+}
+
+#cart-section h2 {
+    color: var(--detalhe);
+    text-transform: uppercase;
+    font-size: 2.5rem;
+    text-align: center;
+    margin-top: 0;
+}
+
+#cart-items {
+    flex-grow: 1;
+    overflow-y: auto;
+    font-size: 1.2rem;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed var(--texto-secundario);
+}
+
+#cart-total {
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-align: right;
+    margin: 20px 0;
+    border-top: 2px solid var(--detalhe);
+    padding-top: 10px;
+}
+
+#checkout-area {
+    display: none; /* Controlado pelo JS */
+}
+
+/* --- ANIMAÇÃO DE CARREGAMENTO --- */
+#loading-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(11, 22, 20, 0.8); /* Fundo com transparência */
+    display: flex; justify-content: center; align-items: center; z-index: 1000;
+}
+
+.spinner {
+    border: 5px solid rgba(238, 255, 0, 0.2);
+    border-top: 5px solid var(--detalhe);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1001; /* Garante que fique sobre outros elementos */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.toast {
+    background-color: var(--detalhe); /* Cor de detalhe vibrante */
+    color: var(--fundo); /* Cor de fundo escura para o texto */
+    padding: 15px 25px;
+    border-radius: 5px;
+    font-family: var(--fonte-principal);
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    animation: slideInAndOut 3s forwards ease-in-out;
+    opacity: 0; /* Começa invisível */
+}
+
+/* Animação de entrada e saída */
+@keyframes slideInAndOut {
+    0% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    15%, 85% { /* Fica visível na tela */
+        transform: translateX(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.remove-from-cart-btn {
+    background-color: transparent;
+    color: var(--detalhe);
+    border: 1px solid var(--detalhe);
+    border-radius: 50%; /* Deixa o botão redondo */
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-right: 15px;
+    padding: 0;
+    line-height: 1;
+    /* Alinha o 'x' perfeitamente no centro */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.remove-from-cart-btn:hover {
+    background-color: var(--detalhe);
+    color: var(--fundo);
+}
+
+/* Ajuste no item do carrinho para alinhar tudo verticalmente */
+.cart-item {
+    align-items: center; /* Adicione ou modifique esta propriedade */
+}
+
+/* Ajuste para o nome do produto ocupar o espaço restante */
+.cart-item span {
+    flex-grow: 1;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#checkout-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(11, 22, 20, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+#checkout-modal {
+    background: var(--card-fundo);
+    padding: 30px 40px;
+    border-radius: 8px;
+    border: 2px solid var(--detalhe);
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+}
+
+#checkout-modal h2 {
+    color: var(--detalhe);
+    text-transform: uppercase;
+    font-size: 2.5rem;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+#checkout-modal .modal-total {
+    font-size: 1.5rem;
+    margin-bottom: 25px;
+}
+
+#checkout-modal .modal-total strong {
+    font-size: 2rem;
+    color: var(--detalhe);
+}
+
+.form-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+}
+
+.form-group input, .form-group textarea {
+    width: 100%;
+    padding: 12px;
+    background: var(--fundo);
+    border: 1px solid var(--texto-secundario);
+    border-radius: 4px;
+    color: var(--texto-principal);
+    font-family: Arial, sans-serif; /* Usamos uma fonte mais legível para inputs */
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.pix-copy-area {
+    display: flex;
+}
+
+.pix-copy-area textarea {
+    flex-grow: 1;
+    resize: none;
+    height: 80px;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+#copy-pix-btn {
+    margin-left: 10px;
+    padding: 0 20px;
+    background-color: var(--texto-secundario);
+    color: var(--fundo);
+    border: none;
+    cursor: pointer;
+    font-family: var(--fonte-principal);
+    text-transform: uppercase;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+
+#cancel-order-btn, #confirm-order-btn {
+    padding: 12px 20px;
+    width: 48%;
+    font-size: 1.2rem;
+}
+
+#cancel-order-btn {
+    background-color: transparent;
+    border: 2px solid var(--texto-secundario);
+    color: var(--texto-secundario);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}

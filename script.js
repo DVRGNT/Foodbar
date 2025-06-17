@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // !!! IMPORTANTE: Cole aqui a URL do seu App da Web !!!
-    const API_URL = 'https://script.google.com/macros/s/AKfycbwzdWPIMjXywQTGud3Mb8rJh3fA2BA8B08mzpiqaFrMyYIrv1MU3L2J2ALGrLloQQ46UQ/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbwkVhG4oEuHA5xyy54UfoGC3AvT2w8HLq2usfsfYvmWyG5KLu4LZrv_KPqs3-wDFy3WHQ/exec';
 
     const productList = document.getElementById('product-list');
     const productCardTemplate = document.getElementById('product-card-template');
@@ -9,6 +9,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkoutArea = document.getElementById('checkout-area');
     const finalizePurchaseBtn = document.getElementById('finalize-purchase');
     const loadingOverlay = document.getElementById('loading-overlay');
+
+    const modalOverlay = document.getElementById('checkout-modal-overlay');
+    const modalTotalValue = document.getElementById('modal-total-value');
+    const customerNameInput = document.getElementById('customer-name');
+    const pixCodeTextarea = document.getElementById('pix-code');
+    const copyPixBtn = document.getElementById('copy-pix-btn');
+    const confirmOrderBtn = document.getElementById('confirm-order-btn');
+    const cancelOrderBtn = document.getElementById('cancel-order-btn');
 
     let allProducts = [];
     let cart = [];
@@ -84,15 +92,17 @@ document.addEventListener('DOMContentLoaded', () => {
             cart.push({ ...product, quantidade: quantity });
         }
         
-        alert(`${quantity}x ${product.nome} adicionado(s) ao carrinho!`);
+        showToast(`${quantity}x ${product.nome} adicionado(s) ao carrinho!`);
         renderCart();
     }
 
+    // Substitua sua função renderCart antiga por esta
     function renderCart() {
         cartItemsContainer.innerHTML = '';
         if (cart.length === 0) {
             cartItemsContainer.innerHTML = '<p>Seu carrinho está vazio.</p>';
             checkoutArea.style.display = 'none';
+            cartTotalElement.style.display = 'none'; // Esconde o total se o carrinho estiver vazio
             return;
         }
 
@@ -100,46 +110,171 @@ document.addEventListener('DOMContentLoaded', () => {
         cart.forEach(item => {
             const itemElement = document.createElement('div');
             itemElement.className = 'cart-item';
-            itemElement.innerHTML = `<span>${item.quantidade}x ${item.nome}</span> <strong>R$ ${(item.preco * item.quantidade).toFixed(2).replace('.', ',')}</strong>`;
+
+            // --- CRIAÇÃO DO BOTÃO REMOVER ---
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-from-cart-btn';
+            removeBtn.textContent = '×'; // Usando um 'x' de multiplicação que é mais elegante
+            removeBtn.title = `Remover ${item.nome}`; // Dica ao passar o mouse
+            removeBtn.addEventListener('click', () => {
+                removeFromCart(item.id);
+            });
+            // ------------------------------------
+
+            const itemName = document.createElement('span');
+            itemName.textContent = `${item.quantidade}x ${item.nome}`;
+
+            const itemPrice = document.createElement('strong');
+            itemPrice.textContent = `R$ ${(item.preco * item.quantidade).toFixed(2).replace('.', ',')}`;
+
+            // Adiciona os elementos na ordem: Botão, Nome, Preço
+            itemElement.appendChild(removeBtn);
+            itemElement.appendChild(itemName);
+            itemElement.appendChild(itemPrice);
+
             cartItemsContainer.appendChild(itemElement);
             total += item.preco * item.quantidade;
         });
 
+        cartTotalElement.style.display = 'block'; // Mostra o total
         cartTotalElement.innerHTML = `<strong>Total: R$ ${total.toFixed(2).replace('.', ',')}</strong>`;
         checkoutArea.style.display = 'block';
     }
 
+    /**
+     * Mostra uma notificação "toast" no canto da tela.
+     * @param {string} message A mensagem a ser exibida.
+     */
+    function showToast(message) {
+        const container = document.getElementById('toast-container');
+
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.textContent = message;
+
+        container.appendChild(toast);
+
+        // Remove o elemento da árvore DOM depois que a animação terminar (3 segundos)
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+
+    /**
+     * Remove um produto do carrinho baseado no seu ID (que é o nome do produto).
+     * @param {string} productId O ID do produto a ser removido.
+     */
+    function removeFromCart(productId) {
+        // Filtra o carrinho, criando um novo array que exclui o item com o ID correspondente.
+        cart = cart.filter(item => item.id !== productId);
+
+        // Re-renderiza o carrinho para mostrar a remoção e atualizar o total.
+        renderCart();
+
+        // Mostra uma notificação sutil.
+        showToast("Item removido do carrinho.");
+    }
+
     // A função finalizePurchase não precisa de alterações
-    async function finalizePurchase() {
+    async function finalizePurchase(customerName, totalValue) {
         if (cart.length === 0) {
             alert('Seu carrinho está vazio!');
             return;
         }
+
         showLoading(true);
+
+        // Prepara os dados para enviar ao backend, incluindo nome e valor
         const orderPayload = {
+            customerName: customerName,
+            totalValue: totalValue,
             items: cart.map(item => ({ id: item.id, quantidade: item.quantidade, nome: item.nome }))
         };
 
         try {
-            await fetch(API_URL, {
+            const response = await fetch(API_URL, {
                 method: 'POST',
-                mode: 'no-cors',
+                mode: 'no-cors', 
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(orderPayload),
             });
-            alert('Compra finalizada com sucesso! O estoque foi atualizado.');
+
+            showToast('Compra confirmada com sucesso!');
             cart = [];
             renderCart();
             fetchProducts();
+
         } catch (error) {
             console.error('Erro ao finalizar compra:', error);
-            alert('Ocorreu um erro ao finalizar a compra.');
+            showToast('Ocorreu um erro ao finalizar a compra.');
         } finally {
             showLoading(false);
         }
     }
     
-    finalizePurchaseBtn.addEventListener('click', finalizePurchase);
+    finalizePurchaseBtn.addEventListener('click', openCheckoutModal);
+
+    function openCheckoutModal() {
+        if (cart.length === 0) {
+            showToast("Seu carrinho está vazio!");
+            return;
+        }
+
+        // Calcula o total
+        const total = cart.reduce((sum, item) => sum + (item.preco * item.quantidade), 0);
+
+        // Formata e exibe o total na modal
+        modalTotalValue.textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+
+        // Gera e exibe o "PIX Copia e Cola"
+        // Nota: Este é um código de referência, não um BR Code válido de um banco.
+        const pixPayload = `
+00020126580014BR.GOV.BCB.PIX01362834579e-a476-440b-9e3c-37f3cb697aa85204000053039865802BR5925DIVERGENTE PRODUCAO E SER6009SAO PAULO61080540900062250521aOeIKyLBjX6Kakj1jf3p663042261`;
+        pixCodeTextarea.value = pixPayload;
+
+        // Limpa o campo de nome e o estado do botão de copiar
+        customerNameInput.value = '';
+        copyPixBtn.textContent = 'Copiar';
+
+        // Mostra a modal
+        modalOverlay.classList.remove('hidden');
+    }
+
+    function closeCheckoutModal() {
+        modalOverlay.classList.add('hidden');
+    }
+
+    function copyPixToClipboard() {
+        pixCodeTextarea.select();
+        document.execCommand('copy');
+        copyPixBtn.textContent = 'Copiado!';
+        showToast('Código PIX copiado!');
+    }
+
+    // Adiciona os listeners aos botões da modal
+    confirmOrderBtn.addEventListener('click', () => {
+        const customerName = customerNameInput.value.trim();
+        if (customerName === '') {
+            showToast('Por favor, digite seu nome.');
+            return;
+        }
+
+        const totalValue = cart.reduce((sum, item) => sum + (item.preco * item.quantidade), 0);
+
+        // Chama a função para finalizar a compra, passando os dados
+        finalizePurchase(customerName, totalValue);
+
+        closeCheckoutModal();
+    });
+
+    cancelOrderBtn.addEventListener('click', closeCheckoutModal);
+    modalOverlay.addEventListener('click', (event) => {
+        // Fecha a modal se o clique for no fundo escuro, e não na janela em si
+        if (event.target === modalOverlay) {
+            closeCheckoutModal();
+        }
+    });
+    copyPixBtn.addEventListener('click', copyPixToClipboard);
 
     fetchProducts();
 });
