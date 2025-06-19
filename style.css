@@ -25,6 +25,10 @@ body {
     box-sizing: border-box;
 }
 
+header {
+    position: relative;
+}
+
 /* --- CABEÇALHO --- */
 header h1 {
     grid-area: header;
@@ -274,46 +278,72 @@ aside#cart-section {
     display: none !important;
 }
 
-#checkout-modal-overlay {
+#user-display {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    background-color: var(--card-fundo);
+    color: var(--texto-principal);
+    padding: 10px 15px;
+    border-radius: 5px;
+    border: 1px solid var(--detalhe);
+    font-size: 1.1rem;
+    text-transform: uppercase;
+}
+
+#user-display strong {
+    color: var(--detalhe);
+}
+
+/* Modal de Login */
+#login-modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(11, 22, 20, 0.9);
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(11, 22, 20, 0.95);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 2000;
-    animation: fadeIn 0.3s ease-in-out;
+    z-index: 4000;
 }
 
-#checkout-modal {
+#login-modal {
     background: var(--card-fundo);
-    padding: 30px 40px;
+    padding: 40px;
     border-radius: 8px;
-    border: 2px solid var(--detalhe);
-    width: 90%;
-    max-width: 500px;
     text-align: center;
+    border-top: 4px solid var(--detalhe);
 }
 
-#checkout-modal h2 {
-    color: var(--detalhe);
-    text-transform: uppercase;
+#login-modal h2 {
     font-size: 2.5rem;
-    margin-top: 0;
-    margin-bottom: 20px;
+    color: var(--detalhe);
+    margin: 0 0 10px 0;
 }
 
-#checkout-modal .modal-total {
-    font-size: 1.5rem;
+#login-modal p {
+    font-size: 1.2rem;
+    color: var(--texto-secundario);
     margin-bottom: 25px;
 }
 
-#checkout-modal .modal-total strong {
-    font-size: 2rem;
-    color: var(--detalhe);
+#login-modal input {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 25px;
+    text-align: center;
+    font-size: 1.5rem;
+    background: var(--fundo);
+    border: 1px solid var(--texto-secundario);
+    border-radius: 4px;
+    color: var(--texto-principal);
+    box-sizing: border-box;
+}
+
+#login-modal button {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.5rem;
 }
 
 .form-group {

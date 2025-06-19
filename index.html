@@ -14,6 +14,7 @@
 <body>
     <header>
         <h1>FOOD BAR</h1>
+        <div id="user-display"></div>
     </header>
     <main>
         <div id="product-list" class="product-grid">
@@ -54,28 +55,12 @@
 
     <div id="toast-container"></div>
 
-    <div id="checkout-modal-overlay" class="hidden">
-        <div id="checkout-modal">
-            <h2>Finalizar Pedido</h2>
-            <p class="modal-total">Valor Total: <strong id="modal-total-value"></strong></p>
-            
-            <div class="form-group">
-                <label for="customer-name">Seu Nome:</label>
-                <input type="text" id="customer-name" placeholder="Digite seu nome para registro">
-            </div>
-
-            <div class="form-group">
-                <label for="pix-code">PIX Copia e Cola:</label>
-                <div class="pix-copy-area">
-                    <textarea id="pix-code" readonly></textarea>
-                    <button id="copy-pix-btn" title="Copiar código PIX">Copiar</button>
-                </div>
-            </div>
-            
-            <div class="modal-actions">
-                <button id="cancel-order-btn">Cancelar</button>
-                <button id="confirm-order-btn">Confirmar Pedido</button>
-            </div>
+    <div id="login-modal-overlay" class="hidden">
+        <div id="login-modal">
+            <h2>Bem-vindo(a) ao Food Bar!</h2>
+            <p>Para começar, por favor, digite seu nome:</p>
+            <input type="text" id="login-name-input" placeholder="Seu nome aqui">
+            <button id="login-submit-btn">Entrar</button>
         </div>
     </div>
 
