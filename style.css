@@ -14,11 +14,11 @@ body {
     color: var(--texto-principal);
     display: grid;
     grid-template-columns: 3fr 1fr;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: 0.1fr 1fr;
     grid-template-areas:
         "header header"
         "main aside";
-    gap: 20px;
+    gap: 15px;
     margin: 0;
     padding: 20px;
     height: 100vh;
@@ -280,6 +280,7 @@ aside#cart-section {
 
 #user-display {
     position: absolute;
+    margin-top: 25px;
     top: 10px;
     right: 20px;
     background-color: var(--card-fundo);
@@ -413,4 +414,27 @@ aside#cart-section {
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
+}
+
+#user-display {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Espaço entre o texto e o botão */
+}
+
+#change-user-btn {
+    background-color: transparent;
+    color: var(--texto-secundario);
+    border: 1px solid var(--texto-secundario);
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-family: var(--fonte-principal);
+}
+
+#change-user-btn:hover {
+    background-color: var(--texto-secundario);
+    color: var(--fundo);
 }

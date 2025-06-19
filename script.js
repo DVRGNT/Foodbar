@@ -1,8 +1,8 @@
-// CÓDIGO COMPLETO DO SCRIPT.JS - VERSÃO COM USUÁRIOS
+// CÓDIGO COMPLETO E FINAL DO SCRIPT.JS
 document.addEventListener('DOMContentLoaded', initializeApp);
 
 // --- VARIÁVEIS GLOBAIS ---
-const API_URL = 'https://script.google.com/macros/s/AKfycbyCi429C2jAQfHQPfEIResniNe8xt5zwVS8Eflr4sdt3R2r8ZPdF7K4huWTvLYKZuMdTw/exec'; // !!! IMPORTANTE !!!
+const API_URL = 'https://script.google.com/macros/s/AKfycbyii059EeyKgYK7O8ZzC3ZPLhqvOU9Xm8YMJ4oCIX1UpHup9tzfkg_QCyo6Y9CqxA5Dyw/exec'; // !!! IMPORTANTE !!!
 let allProducts = [];
 let cart = [];
 let currentUser = { name: null, totalSpent: 0 };
@@ -30,32 +30,65 @@ function initializeApp() {
 function checkUserSession() {
     const storedName = localStorage.getItem('foodBarUserName');
     if (storedName) {
-        currentUser.name = storedName;
-        updateUserDisplay();
+        // Se já existe um usuário salvo, busca os dados dele
+        loadUserData(storedName);
     } else {
+        // Se não, mostra a tela de login
         loginModalOverlay.classList.remove('hidden');
     }
 
     loginSubmitBtn.addEventListener('click', () => {
         const name = loginNameInput.value.trim();
         if (name) {
-            currentUser.name = name;
-            localStorage.setItem('foodBarUserName', name);
             loginModalOverlay.classList.add('hidden');
-            updateUserDisplay();
+            // Carrega os dados do novo usuário (o gasto será 0 se ele não existir na planilha)
+            loadUserData(name);
+            localStorage.setItem('foodBarUserName', name);
         }
     });
 }
 
-function updateUserDisplay() {
-    if (currentUser.name) {
-        userDisplay.innerHTML = `Bem-vindo, <strong>${currentUser.name}</strong>`;
-    } else {
-        userDisplay.innerHTML = '';
+async function loadUserData(name) {
+    currentUser.name = name;
+    updateUserDisplay(); // Mostra o nome imediatamente
+    try {
+        const response = await fetch(`${API_URL}?user=${encodeURIComponent(name)}`);
+        const data = await response.json();
+        currentUser.totalSpent = data.gastoTotal || 0;
+    } catch (error) {
+        console.error("Erro ao buscar dados do usuário:", error);
+        currentUser.totalSpent = 0; // Assume 0 em caso de erro
+    } finally {
+        // Atualiza a tela com o valor que veio da planilha
+        updateUserDisplay();
     }
 }
 
-// --- LÓGICA DE PRODUTOS E CARRINHO ---
+function updateUserDisplay() {
+    userDisplay.innerHTML = '';
+    if (currentUser.name) {
+        const welcomeText = document.createElement('span');
+        welcomeText.innerHTML = `Bem-vindo, <strong>${currentUser.name}</strong> | Gasto Total: <strong>R$ ${currentUser.totalSpent.toFixed(2).replace('.', ',')}</strong>`;
+
+        const changeUserBtn = document.createElement('button');
+        changeUserBtn.textContent = 'Trocar';
+        changeUserBtn.id = 'change-user-btn';
+        changeUserBtn.addEventListener('click', logout);
+
+        userDisplay.appendChild(welcomeText);
+        userDisplay.appendChild(changeUserBtn);
+    }
+}
+
+function logout() {
+    if (confirm('Deseja trocar de usuário? O carrinho atual será esvaziado.')) {
+        localStorage.removeItem('foodBarUserName');
+        cart = [];
+        location.reload();
+    }
+}
+
+// --- LÓGICA DE PRODUTOS E CARRINHO (sem alterações) ---
 async function fetchProducts() {
     showLoading(true);
     try {
@@ -63,15 +96,10 @@ async function fetchProducts() {
         const data = await response.json();
         allProducts = data.produtos;
         renderProducts();
-    } catch (error) {
-        console.error(error);
-    } finally {
-        showLoading(false);
-    }
+    } catch (error) { console.error(error); } finally { showLoading(false); }
 }
 
 function renderProducts() {
-    // (Esta função não muda, pode usar a sua versão anterior)
     productList.innerHTML = '';
     allProducts.forEach(product => {
         const card = productCardTemplate.content.cloneNode(true);
@@ -89,24 +117,16 @@ function renderProducts() {
 
 function addToCart(product, quantity) {
     const existingItem = cart.find(item => item.id === product.id);
-    if (existingItem) {
-        existingItem.quantidade += quantity;
-    } else {
-        cart.push({ ...product, quantidade: quantity });
-    }
+    if (existingItem) { existingItem.quantidade += quantity; } else { cart.push({ ...product, quantidade: quantity }); }
     showToast(`${quantity}x ${product.nome} adicionado!`);
     renderCart();
 }
 
 function renderCart() {
-    // (Esta função não muda, pode usar a sua versão anterior)
     cartItemsContainer.innerHTML = '';
-    if (cart.length === 0) {
-        cartItemsContainer.innerHTML = '<p>Seu carrinho está vazio.</p>';
-        finalizePurchaseBtn.style.display = 'none';
-        cartTotalElement.style.display = 'none';
-        return;
-    }
+    finalizePurchaseBtn.style.display = 'none';
+    cartTotalElement.style.display = 'none';
+    if (cart.length === 0) { cartItemsContainer.innerHTML = '<p>Seu carrinho está vazio.</p>'; return; }
     let total = 0;
     cart.forEach(item => {
         const itemElement = document.createElement('div');
@@ -120,9 +140,7 @@ function renderCart() {
         itemName.textContent = `${item.quantidade}x ${item.nome}`;
         const itemPrice = document.createElement('strong');
         itemPrice.textContent = `R$ ${(item.preco * item.quantidade).toFixed(2).replace('.', ',')}`;
-        itemElement.appendChild(removeBtn);
-        itemElement.appendChild(itemName);
-        itemElement.appendChild(itemPrice);
+        itemElement.appendChild(removeBtn); itemElement.appendChild(itemName); itemElement.appendChild(itemPrice);
         cartItemsContainer.appendChild(itemElement);
         total += item.preco * item.quantidade;
     });
@@ -139,10 +157,7 @@ function removeFromCart(productId) {
 
 // --- LÓGICA DE COMPRA ---
 function handlePurchase() {
-    if (cart.length === 0) {
-        showToast("Carrinho vazio!");
-        return;
-    }
+    if (cart.length === 0) { showToast("Carrinho vazio!"); return; }
     if (confirm("Confirmar a compra deste carrinho?")) {
         finalizePurchase();
     }
@@ -156,17 +171,14 @@ async function finalizePurchase() {
         totalValue: totalValue,
         items: cart.map(item => ({ id: item.id, quantidade: item.quantidade, nome: item.nome }))
     };
-
     try {
-        await fetch(API_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify(orderPayload)
-        });
+        await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(orderPayload) });
         showToast('Compra registrada com sucesso!');
+        // ATUALIZA O GASTO TOTAL NA TELA INSTANTANEAMENTE
+        currentUser.totalSpent += totalValue;
+        updateUserDisplay();
         cart = [];
         renderCart();
-        fetchProducts();
     } catch (error) {
         showToast('Ocorreu um erro ao registrar a compra.');
         console.error(error);
@@ -182,6 +194,7 @@ function showLoading(show) {
 
 function showToast(message) {
     const container = document.getElementById('toast-container');
+    if (!container) return;
     const toast = document.createElement('div');
     toast.className = 'toast';
     toast.textContent = message;
