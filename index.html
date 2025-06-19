@@ -43,6 +43,8 @@
 
     <template id="product-card-template">
         <div class="product-card">
+            <img class="product-image" src="" alt="Imagem do Produto"> 
+
             <h3 class="product-name"></h3>
             <p class="product-price"></p>
             <p class="product-stock"></p>
@@ -64,6 +66,22 @@
             <p>Para começar, por favor, digite seu nome:</p>
             <input type="text" id="login-name-input" placeholder="Seu nome aqui">
             <button id="login-submit-btn">Entrar</button>
+        </div>
+    </div>
+
+    <a href="#cart-section" id="mobile-cart-btn" class="hidden">
+        <span id="mobile-cart-count">0</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+    </a>
+
+    <div id="confirm-purchase-overlay" class="hidden">
+        <div id="confirm-purchase-modal">
+            <h2>Confirmar Pedido?</h2>
+            <p id="confirm-purchase-text">Você está prestes a finalizar uma compra no valor de...</p>
+            <div class="modal-actions">
+                <button id="btn-cancel-purchase">Não, Voltar</button>
+                <button id="btn-confirm-purchase-final">Sim, Confirmar</button>
+            </div>
         </div>
     </div>
 

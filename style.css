@@ -438,3 +438,200 @@ aside#cart-section {
     background-color: var(--texto-secundario);
     color: var(--fundo);
 }
+
+.product-image {
+    width: 100%;
+    height: 150px; /* Altura fixa para todos os cards */
+    object-fit: contain; /* Garante que a imagem caiba sem distorcer */
+    margin-bottom: 15px;
+}
+
+#mobile-cart-btn {
+    display: none; /* Escondido por padrão em telas grandes */
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--detalhe);
+    color: var(--fundo);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    text-decoration: none;
+    transition: transform 0.2s ease-in-out;
+}
+
+#mobile-cart-btn:hover {
+    transform: scale(1.1);
+}
+
+#mobile-cart-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #e63946; /* Um vermelho para contraste */
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif; /* Usamos uma fonte normal para o número */
+}
+
+#confirm-purchase-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(11, 22, 20, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    animation: fadeIn 0.3s;
+}
+
+#confirm-purchase-modal {
+    background: var(--card-fundo);
+    padding: 30px 40px;
+    border-radius: 8px;
+    border: 2px solid var(--detalhe);
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+}
+
+#confirm-purchase-modal h2 {
+    color: var(--detalhe);
+    font-size: 2.2rem;
+    margin: 0 0 15px 0;
+}
+
+#confirm-purchase-modal p {
+    font-family: Arial, sans-serif;
+    font-size: 1.1rem;
+    color: var(--texto-principal);
+    line-height: 1.5;
+    margin-bottom: 30px;
+}
+
+#confirm-purchase-modal .modal-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px; /* Espaço entre os botões */
+    margin-top: 30px;
+}
+
+/* Estilo geral para ambos os botões */
+#btn-cancel-purchase, #btn-confirm-purchase-final {
+    width: 48%; /* Divide o espaço entre os dois */
+    padding: 12px;
+    font-size: 1.2rem;
+    font-family: var(--fonte-principal);
+    text-transform: uppercase;
+    font-weight: 700;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Estilo específico para o botão de confirmação (ação primária) */
+#btn-confirm-purchase-final {
+    background-color: var(--detalhe);
+    color: var(--fundo);
+    border: 2px solid var(--detalhe);
+}
+
+#btn-confirm-purchase-final:hover {
+    background-color: var(--fundo);
+    color: var(--detalhe);
+}
+
+/* Estilo específico para o botão de cancelar (ação secundária) */
+#btn-cancel-purchase {
+    background-color: transparent;
+    color: var(--texto-secundario);
+    border: 2px solid var(--texto-secundario);
+}
+
+#btn-cancel-purchase:hover {
+    background-color: var(--texto-secundario);
+    color: var(--fundo);
+    border-color: var(--texto-secundario);
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+@media (max-width: 800px) {
+
+    /* Altera o layout principal para uma única coluna */
+    body {
+        grid-template-columns: 1fr; /* Apenas uma coluna */
+        grid-template-rows: auto auto 1fr; /* Ajusta as linhas */
+        grid-template-areas:
+            "header"
+            "main"
+            "aside";
+        padding: 10px; /* Menos preenchimento nas laterais */
+        height: auto; /* Permite que o conteúdo cresça */
+    }
+
+    /* Ajusta o cabeçalho */
+    header h1 {
+        font-size: 2.5rem; /* Diminui o tamanho do título principal */
+        letter-spacing: 0.1rem;
+    }
+
+    /* Ajusta o painel do usuário */
+    #user-display {
+        position: static; /* Deixa de ser fixo no canto */
+        flex-direction: column; /* Coloca o texto e o botão um sobre o outro */
+        gap: 5px;
+        margin-top: 10px;
+        text-align: center;
+    }
+
+    /* Ajusta o carrinho (aside) */
+    aside#cart-section {
+        border-left: none; /* Remove a borda lateral */
+        border-top: 4px solid var(--detalhe); /* Adiciona uma borda no topo */
+        margin-top: 20px;
+        padding: 15px;
+    }
+
+    /* Ajusta o grid de produtos para ter menos colunas em telas médias */
+    .product-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
+    }
+
+    /* Diminui a fonte dos cards */
+    .product-card .product-name {
+        font-size: 1.5rem;
+    }
+
+    .product-card .product-price {
+        font-size: 1.8rem;
+    }
+
+    /* Ajusta a janela modal para telas menores */
+    #login-modal {
+        width: 90%;
+        padding: 20px;
+    }
+
+    #login-modal h2 {
+        font-size: 2rem;
+    }
+
+    #mobile-cart-btn {
+        display: flex;
+    }
+}
