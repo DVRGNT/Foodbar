@@ -2,7 +2,7 @@
 document.addEventListener('DOMContentLoaded', initializeApp);
 
 // --- VARIÁVEIS GLOBAIS ---
-const API_URL = 'https://script.google.com/macros/s/AKfycbyii059EeyKgYK7O8ZzC3ZPLhqvOU9Xm8YMJ4oCIX1UpHup9tzfkg_QCyo6Y9CqxA5Dyw/exec'; // !!! IMPORTANTE !!!
+const API_URL = 'https://script.google.com/macros/s/AKfycbzA_v9gjmOMQfza_97Lzh459EDn4H919sXnDrLZOMicjLlT9P7TzJ0T2s1NDMwWJws0/exec';
 let allProducts = [];
 let cart = [];
 let currentUser = { name: null, totalSpent: 0 };
@@ -52,7 +52,7 @@ async function loadUserData(name) {
     currentUser.name = name;
     updateUserDisplay(); // Mostra o nome imediatamente
     try {
-        const response = await fetch(`${API_URL}?user=${encodeURIComponent(name)}`);
+        const response = await fetch(`<span class="math-inline">\{API\_URL\}?user\=</span>{encodeURIComponent(name)}`);
         const data = await response.json();
         currentUser.totalSpent = data.gastoTotal || 0;
     } catch (error) {
