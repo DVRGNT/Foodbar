@@ -2,7 +2,7 @@
 document.addEventListener('DOMContentLoaded', initializeApp);
 
 // --- VARIÁVEIS GLOBAIS ---
-const API_URL = 'https://script.google.com/macros/s/AKfycbyFRatCpg5PVyL6bhcHcJY7IbWQE0ItXTGh9faYMmARfHfH1amiIt_Q4mBP2d476BFzfQ/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbzG6OjZU9G2BeMNi3_2Cl5yk8EE1PCec4b1X6sQwvJ52CozTFVuSh7TiVBmvI6YX_CR/exec';
 let allProducts = [];
 let cart = [];
 let currentUser = { name: null, totalSpent: 0 };
@@ -36,20 +36,20 @@ function initializeApp() {
 function checkUserSession() {
     const storedName = localStorage.getItem('foodBarUserName');
     if (storedName) {
-        // Se já existe um usuário salvo, busca os dados dele
         loadUserData(storedName);
     } else {
-        // Se não, mostra a tela de login
         loginModalOverlay.classList.remove('hidden');
     }
 
     loginSubmitBtn.addEventListener('click', () => {
-        const name = loginNameInput.value.trim();
-        if (name) {
+        const rawName = loginNameInput.value;
+        if (rawName.trim()) {
+            // Salva o nome original, limpo de espaços, para exibição
+            const cleanName = rawName.trim();
+            localStorage.setItem('foodBarUserName', cleanName);
+
             loginModalOverlay.classList.add('hidden');
-            // Carrega os dados do novo usuário (o gasto será 0 se ele não existir na planilha)
-            loadUserData(name);
-            localStorage.setItem('foodBarUserName', name);
+            loadUserData(cleanName);
         }
     });
 }
@@ -283,3 +283,12 @@ btnConfirmFinal.addEventListener('click', () => {
 btnCancelPurchase.addEventListener('click', () => {
     confirmPurchaseOverlay.classList.add('hidden');
 });
+
+function normalizeString(text) {
+  if (typeof text !== 'string') return '';
+  return text
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
