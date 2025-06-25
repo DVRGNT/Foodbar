@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', initializeApp);
 
 // --- VARIÁVEIS GLOBAIS ---
 // !!! VERIFIQUE SE A URL AINDA É A CORRETA !!!
-const API_URL = 'https://script.google.com/macros/s/AKfycbwE4f1iW_bUrD_6C3cRlgx6ckhnn8YGOFx-DvzvyTMwyfAGwqWp5nHn18Qta5zC7SFK/exec'; 
+const API_URL = 'https://script.google.com/macros/s/AKfycbyzXJSTccuCm8tIcWIAW97AvfqlWMZk5RIJrXDGd5TPLsSdWNofnn5FY8-8RKPAJS6pTg/exec'; 
 
 let allProducts = [];
 let cart = [];
@@ -134,14 +134,41 @@ function renderProducts() {
     productList.innerHTML = '';
     allProducts.forEach(product => {
         const card = productCardTemplate.content.cloneNode(true);
+
+        // --- BLOCO DE CÓDIGO PARA CONFIGURAR A IMAGEM ---
+        // Pega o elemento da imagem dentro do card
+        const productImage = card.querySelector('.product-image');
+        
+        // Verifica se o produto tem um link de imagem E se o elemento da imagem existe
+        if (product.imagem && productImage) {
+            productImage.src = product.imagem;
+            productImage.alt = product.nome; // Boa prática para acessibilidade
+        }
+        // --------------------------------------------------
+
+        // Configura o restante das informações do card (seu código aqui já estava correto)
         card.querySelector('.product-name').textContent = product.nome;
         card.querySelector('.product-price').textContent = `R$ ${product.preco.toFixed(2).replace('.', ',')}`;
         card.querySelector('.product-stock').textContent = `Estoque: ${product.estoque}`;
+        
         const quantityInput = card.querySelector('.quantity-input');
         quantityInput.max = product.estoque;
-        card.querySelector('.plus').addEventListener('click', () => { if (parseInt(quantityInput.value) < product.estoque) quantityInput.value = parseInt(quantityInput.value) + 1; });
-        card.querySelector('.minus').addEventListener('click', () => { if (parseInt(quantityInput.value) > 1) quantityInput.value = parseInt(quantityInput.value) - 1; });
-        card.querySelector('.add-to-cart-btn').addEventListener('click', () => { addToCart(product, parseInt(quantityInput.value)); });
+
+        card.querySelector('.plus').addEventListener('click', () => { 
+            if (parseInt(quantityInput.value) < product.estoque) {
+                quantityInput.value = parseInt(quantityInput.value) + 1;
+            } 
+        });
+        card.querySelector('.minus').addEventListener('click', () => { 
+            if (parseInt(quantityInput.value) > 1) {
+                quantityInput.value = parseInt(quantityInput.value) - 1;
+            }
+        });
+        card.querySelector('.add-to-cart-btn').addEventListener('click', () => { 
+            addToCart(product, parseInt(quantityInput.value)); 
+        });
+
+        // Adiciona o card pronto à página
         productList.appendChild(card);
     });
 }
