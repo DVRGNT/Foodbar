@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', initializeApp);
 
 // --- VARIÁVEIS GLOBAIS ---
 // !!! VERIFIQUE SE A URL AINDA É A CORRETA !!!
-const API_URL = 'https://script.google.com/macros/s/AKfycbyzXJSTccuCm8tIcWIAW97AvfqlWMZk5RIJrXDGd5TPLsSdWNofnn5FY8-8RKPAJS6pTg/exec'; 
+const API_URL = 'https://script.google.com/macros/s/AKfycbwIlK7T0bNljpvGnEvWmu51jk_DexkaD592lU0ssKHmVNABwXK7vmRtawwJzqswEawWng/exec'; 
 
 let allProducts = [];
 let cart = [];
