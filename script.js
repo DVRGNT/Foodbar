@@ -1,35 +1,60 @@
-// CÓDIGO COMPLETO E FINAL DO SCRIPT.JS
+// ===================================================================
+// VERSÃO COMPLETA E FINAL DO SCRIPT.JS - PARA GARANTIR ESTABILIDADE
+// ===================================================================
+
 document.addEventListener('DOMContentLoaded', initializeApp);
 
 // --- VARIÁVEIS GLOBAIS ---
-const API_URL = 'https://script.google.com/macros/s/AKfycbzG6OjZU9G2BeMNi3_2Cl5yk8EE1PCec4b1X6sQwvJ52CozTFVuSh7TiVBmvI6YX_CR/exec';
+// !!! VERIFIQUE SE A URL AINDA É A CORRETA !!!
+const API_URL = 'https://script.google.com/macros/s/AKfycbwE4f1iW_bUrD_6C3cRlgx6ckhnn8YGOFx-DvzvyTMwyfAGwqWp5nHn18Qta5zC7SFK/exec'; 
+
 let allProducts = [];
 let cart = [];
 let currentUser = { name: null, totalSpent: 0 };
 
 // --- ELEMENTOS DO DOM ---
-const productList = document.getElementById('product-list');
-const productCardTemplate = document.getElementById('product-card-template');
-const cartItemsContainer = document.getElementById('cart-items');
-const cartTotalElement = document.getElementById('cart-total');
-const finalizePurchaseBtn = document.getElementById('finalize-purchase');
-const loadingOverlay = document.getElementById('loading-overlay');
-const userDisplay = document.getElementById('user-display');
-const loginModalOverlay = document.getElementById('login-modal-overlay');
-const loginNameInput = document.getElementById('login-name-input');
-const loginSubmitBtn = document.getElementById('login-submit-btn');
-const mobileCartBtn = document.getElementById('mobile-cart-btn');
-const mobileCartCount = document.getElementById('mobile-cart-count');
-const confirmPurchaseOverlay = document.getElementById('confirm-purchase-overlay');
-const confirmPurchaseText = document.getElementById('confirm-purchase-text');
-const btnConfirmFinal = document.getElementById('btn-confirm-purchase-final');
-const btnCancelPurchase = document.getElementById('btn-cancel-purchase');
+let productList, productCardTemplate, cartItemsContainer, cartTotalElement,
+    finalizePurchaseBtn, loadingOverlay, userDisplay, loginModalOverlay,
+    loginNameInput, loginSubmitBtn, mobileCartBtn, mobileCartCount,
+    confirmPurchaseOverlay, confirmPurchaseText, btnConfirmFinal, btnCancelPurchase;
 
 // --- INICIALIZAÇÃO ---
 function initializeApp() {
+    // Atribui os elementos do DOM aqui para garantir que a página carregou
+    productList = document.getElementById('product-list');
+    productCardTemplate = document.getElementById('product-card-template');
+    cartItemsContainer = document.getElementById('cart-items');
+    cartTotalElement = document.getElementById('cart-total');
+    finalizePurchaseBtn = document.getElementById('finalize-purchase');
+    loadingOverlay = document.getElementById('loading-overlay');
+    userDisplay = document.getElementById('user-display');
+    loginModalOverlay = document.getElementById('login-modal-overlay');
+    loginNameInput = document.getElementById('login-name-input');
+    loginSubmitBtn = document.getElementById('login-submit-btn');
+    mobileCartBtn = document.getElementById('mobile-cart-btn');
+    mobileCartCount = document.getElementById('mobile-cart-count');
+    confirmPurchaseOverlay = document.getElementById('confirm-purchase-overlay');
+    confirmPurchaseText = document.getElementById('confirm-purchase-text');
+    btnConfirmFinal = document.getElementById('btn-confirm-purchase-final');
+    btnCancelPurchase = document.getElementById('btn-cancel-purchase');
+    
+    if (API_URL === 'COLE_A_URL_DA_SUA_API_AQUI') {
+        alert('ERRO CRÍTICO: A URL da API não foi definida no arquivo script.js!');
+        return;
+    }
+    
     fetchProducts();
     checkUserSession();
+
+    // Listeners de eventos
     finalizePurchaseBtn.addEventListener('click', handlePurchase);
+    btnConfirmFinal.addEventListener('click', () => {
+        confirmPurchaseOverlay.classList.add('hidden');
+        finalizePurchase();
+    });
+    btnCancelPurchase.addEventListener('click', () => {
+        confirmPurchaseOverlay.classList.add('hidden');
+    });
 }
 
 // --- LÓGICA DE USUÁRIO ---
@@ -40,32 +65,28 @@ function checkUserSession() {
     } else {
         loginModalOverlay.classList.remove('hidden');
     }
-
     loginSubmitBtn.addEventListener('click', () => {
-        const rawName = loginNameInput.value;
-        if (rawName.trim()) {
-            // Salva o nome original, limpo de espaços, para exibição
-            const cleanName = rawName.trim();
-            localStorage.setItem('foodBarUserName', cleanName);
-
+        const name = loginNameInput.value.trim();
+        if (name) {
+            localStorage.setItem('foodBarUserName', name);
             loginModalOverlay.classList.add('hidden');
-            loadUserData(cleanName);
+            loadUserData(name);
         }
     });
 }
 
 async function loadUserData(name) {
     currentUser.name = name;
-    updateUserDisplay(); // Mostra o nome imediatamente
+    updateUserDisplay();
     try {
-        const response = await fetch(`<span class="math-inline">\{API\_URL\}?user\=</span>{encodeURIComponent(name)}`);
+        const response = await fetch(`${API_URL}?user=${encodeURIComponent(name)}`);
+        if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
         const data = await response.json();
         currentUser.totalSpent = data.gastoTotal || 0;
     } catch (error) {
         console.error("Erro ao buscar dados do usuário:", error);
-        currentUser.totalSpent = 0; // Assume 0 em caso de erro
+        currentUser.totalSpent = 0;
     } finally {
-        // Atualiza a tela com o valor que veio da planilha
         updateUserDisplay();
     }
 }
@@ -75,12 +96,10 @@ function updateUserDisplay() {
     if (currentUser.name) {
         const welcomeText = document.createElement('span');
         welcomeText.innerHTML = `Bem-vindo, <strong>${currentUser.name}</strong> | Gasto Total: <strong>R$ ${currentUser.totalSpent.toFixed(2).replace('.', ',')}</strong>`;
-
         const changeUserBtn = document.createElement('button');
         changeUserBtn.textContent = 'Trocar';
         changeUserBtn.id = 'change-user-btn';
         changeUserBtn.addEventListener('click', logout);
-
         userDisplay.appendChild(welcomeText);
         userDisplay.appendChild(changeUserBtn);
     }
@@ -94,15 +113,21 @@ function logout() {
     }
 }
 
-// --- LÓGICA DE PRODUTOS E CARRINHO (sem alterações) ---
+// --- LÓGICA DE PRODUTOS E CARRINHO ---
 async function fetchProducts() {
     showLoading(true);
     try {
         const response = await fetch(API_URL);
+        if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
         const data = await response.json();
         allProducts = data.produtos;
         renderProducts();
-    } catch (error) { console.error(error); } finally { showLoading(false); }
+    } catch (error) {
+        console.error("Erro ao buscar produtos:", error);
+        productList.innerHTML = `<p>Não foi possível carregar os produtos. Verifique a URL da API e a implantação.</p>`;
+    } finally {
+        showLoading(false);
+    }
 }
 
 function renderProducts() {
@@ -132,19 +157,11 @@ function renderCart() {
     cartItemsContainer.innerHTML = '';
     finalizePurchaseBtn.style.display = 'none';
     cartTotalElement.style.display = 'none';
-    mobileCartBtn.classList.add('hidden'); // Esconde por padrão
-
-    if (cart.length === 0) {
-        cartItemsContainer.innerHTML = '<p>Seu carrinho está vazio.</p>';
-        return;
-    }
-
-    // --- LÓGICA DO BOTÃO FLUTUANTE ---
+    mobileCartBtn.classList.add('hidden');
+    if (cart.length === 0) { cartItemsContainer.innerHTML = '<p>Seu carrinho está vazio.</p>'; return; }
     const totalItems = cart.reduce((sum, item) => sum + item.quantidade, 0);
     mobileCartCount.textContent = totalItems;
     mobileCartBtn.classList.remove('hidden');
-    // --------------------------------
-
     let total = 0;
     cart.forEach(item => {
         const itemElement = document.createElement('div');
@@ -158,9 +175,7 @@ function renderCart() {
         itemName.textContent = `${item.quantidade}x ${item.nome}`;
         const itemPrice = document.createElement('strong');
         itemPrice.textContent = `R$ ${(item.preco * item.quantidade).toFixed(2).replace('.', ',')}`;
-        itemElement.appendChild(removeBtn);
-        itemElement.appendChild(itemName);
-        itemElement.appendChild(itemPrice);
+        itemElement.appendChild(removeBtn); itemElement.appendChild(itemName); itemElement.appendChild(itemPrice);
         cartItemsContainer.appendChild(itemElement);
         total += item.preco * item.quantidade;
     });
@@ -177,16 +192,9 @@ function removeFromCart(productId) {
 
 // --- LÓGICA DE COMPRA ---
 function handlePurchase() {
-    if (cart.length === 0) {
-        showToast("Carrinho vazio!");
-        return;
-    }
-
-    // Calcula o total e atualiza o texto do modal
+    if (cart.length === 0) { showToast("Carrinho vazio!"); return; }
     const totalValue = cart.reduce((sum, item) => sum + (item.preco * item.quantidade), 0);
     confirmPurchaseText.innerHTML = `Você está prestes a finalizar uma compra no valor de <strong>R$ ${totalValue.toFixed(2).replace('.', ',')}</strong>. Deseja continuar?`;
-
-    // Abre o modal
     confirmPurchaseOverlay.classList.remove('hidden');
 }
 
@@ -201,7 +209,6 @@ async function finalizePurchase() {
     try {
         await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(orderPayload) });
         showToast('Compra registrada com sucesso!');
-        // ATUALIZA O GASTO TOTAL NA TELA INSTANTANEAMENTE
         currentUser.totalSpent += totalValue;
         updateUserDisplay();
         cart = [];
@@ -227,68 +234,4 @@ function showToast(message) {
     toast.textContent = message;
     container.appendChild(toast);
     setTimeout(() => toast.remove(), 3000);
-}
-
-function renderProducts() {
-    productList.innerHTML = '';
-    allProducts.forEach(product => {
-        // Cria o card a partir do template
-        const card = productCardTemplate.content.cloneNode(true);
-
-        // --- SEU BLOCO DE IMAGEM (ESTÁ CORRETO) ---
-        // Adicionei uma checagem de segurança extra para o caso do elemento não existir.
-        if (product.imagem) {
-            const productImage = card.querySelector('.product-image');
-            if (productImage) {
-                productImage.src = product.imagem;
-                productImage.alt = product.nome;
-            }
-        }
-        // -----------------------------------------
-
-        // Configura o restante das informações do card
-        card.querySelector('.product-name').textContent = product.nome;
-        card.querySelector('.product-price').textContent = `R$ ${product.preco.toFixed(2).replace('.', ',')}`;
-        card.querySelector('.product-stock').textContent = `Estoque: ${product.estoque}`;
-        
-        const quantityInput = card.querySelector('.quantity-input');
-        quantityInput.max = product.estoque;
-
-        // Adiciona os eventos aos botões do card
-        card.querySelector('.plus').addEventListener('click', () => { 
-            if (parseInt(quantityInput.value) < product.estoque) {
-                quantityInput.value = parseInt(quantityInput.value) + 1;
-            } 
-        });
-        card.querySelector('.minus').addEventListener('click', () => { 
-            if (parseInt(quantityInput.value) > 1) {
-                quantityInput.value = parseInt(quantityInput.value) - 1;
-            }
-        });
-        card.querySelector('.add-to-cart-btn').addEventListener('click', () => { 
-            addToCart(product, parseInt(quantityInput.value)); 
-        });
-
-        // --- A LINHA CRÍTICA QUE ESTAVA FALTANDO ---
-        // Este comando pega o card pronto e o insere na página.
-        productList.appendChild(card);
-    });
-}
-
-btnConfirmFinal.addEventListener('click', () => {
-    confirmPurchaseOverlay.classList.add('hidden');
-    finalizePurchase(); // Chama a função que faz a mágica acontecer
-});
-
-btnCancelPurchase.addEventListener('click', () => {
-    confirmPurchaseOverlay.classList.add('hidden');
-});
-
-function normalizeString(text) {
-  if (typeof text !== 'string') return '';
-  return text
-    .trim()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
 }
